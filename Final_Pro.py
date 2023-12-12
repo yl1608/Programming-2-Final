@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import os
 # Read data into a dataframe named "s"
 
-p = os.getcwd() + '\social_media_usage.csv'
-s = pd.read_csv(p)
-
+#p = os.getcwd() + '\social_media_usage.csv'
+#s = pd.read_csv(p)
+csv_file_path = "social_media_usage.csv"
+s = pd.read_csv(csv_file_path)
 # Check the dimensions of the dataframe
 print(s.shape)
 
