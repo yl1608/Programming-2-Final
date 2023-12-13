@@ -2,11 +2,16 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import os
-# Read data into a dataframe named "s"
+import streamlit as st 
+import altair as alt
+import sklearn
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from PIL import Image
 
-#p = os.getcwd() + '\social_media_usage.csv'
-#s = pd.read_csv(p)
+# Read data into a dataframe named "s"
 csv_file_path = "social_media_usage.csv"
 s = pd.read_csv(csv_file_path)
 # Check the dimensions of the dataframe
@@ -85,94 +90,104 @@ print("y_test shape:", y_test.shape)
 log_model = sm.Logit(y_train, x_train).fit() 
 log_model.summary()
 
-log_model_sklearn = LogisticRegression(class_weight="balanced")
-log_model_sklearn.fit(x_train,y_train)
+lr = LogisticRegression(class_weight="balanced")
+lr.fit(x_train,y_train)
 
-age = st.slider("Age", min_value=0, max_value=97, value=30)
-education_options = [
-    "Less than high school",
-    "High school incomplete",
-    "High school graduate",
-    "Some Collge, no degree",
-    "Two-year associate degree",
-    "Four-year college or university degree",
-    "Some postgraduate or professional schooling",
-    "Postgraduate or professional degree",
-]
-education = st.selectbox("Education", education_options)
+newdata = pd.DataFrame({
+    "Income": [1,8,8],
+    "Age": [12,42,82], 
+    "education":[1,7,1],
+    "Marital Status":[0,1,1],
+    "Parent": [0,0,0],
+    "female": [0,1,1],
+})
 
-income_options = [
-    "Less than $10,000",
-    "$10,000 to under $20,000",
-    "$20,000 to under $30,000",
-    "$30,000 to under $40,000",
-    "$40,000 to under $50,000",
-    "$50,000 to under $75,000",
-    "$75,000 to under $100,000",
-    "$100,000 to under $150,000",
-    "$150,000 or more",
-    "Don't know",
-    "Refused",
-]
-income = st.selectbox("Income", income_options)
+newdata["sm_li"] = lr.predict(newdata) #Our new column
 
-parent_options = [
-    "Yes",
-    "No",
-    "Don't know",
-    "Refused",
-]
-parent = st.selectbox("Are you a parent of a child under 18 living in your home?", parent_options)
+newdata
 
-marital_options = [
-    "Married",
-    "Living with a partner",
-    "Divorced",
-    "Separated",
-    "Widowed",
-    "Never been married",
-    "Don't know",
-    "Refused",
-]
-married = st.selectbox("Marital",marital_options)
+import streamlit as st 
+import pandas as pd
+import numpy as np
+import altair as alt
+import sklearn
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from PIL import Image
 
-gender_options = [
-    "Male",
-    "Female",
-    "Other",
-    "Don't know",
-    "Refused",
-]
-female = st.selectbox("Gender",gender_options)
+image = Image.open('LinkedIn-Blue-21-┬«@2x.png')
+st.image(image, caption='Logo available publicly on LinkedIn Brand Resources webpage', output_format='PNG')
 
+st.markdown("LinkedIn User Prediction App")
 
-def process_inputs(age, education, income, parent, married, gender):
+"Please select the options that apply to you."
+Income = st.selectbox(label="Household Income",
+options=("$10,000 to $20,000", 
+"$20,000 to $30,000", 
+"$40,000 to $50,000", 
+"$50,000 to $75,000", 
+"$100,000 to $150,000", 
+"$150,000+", 
+"Don't Know"))
 
-    education_mapping = {edu: idx for idx, edu in enumerate(education_options)}
-    education_num = education_mapping[education]
+if Income == "$10,000 to $20,000":
+    Income =2
+elif Income == "$20,000 to $30,000":
+    Income =3
+elif Income == "$30,000 to $40,000":
+    Income =4
+else:
+    Income=5
 
-    income_mapping = {inc: idx for idx, inc in enumerate(income_options)}
-    income_num = income_mapping[income]
-    if income in ["Don't know", "Refused"]:
-        income_num = np.nan
+Age = st.slider(label="Enter Your Age", 
+        min_value=1,
+        max_value=100,
+        value=50)
 
-    parent_num = 1 if parent == "Yes" else 0
+education = st.selectbox(label="Highest Level of Education",
+options=("Some High School",  
+"High School Graduate", 
+"Some College, no Degree", 
+"Two -year College or University", 
+"Bachelor's degree (BA,BS,etc.)", 
+"Postgraduate Degree (MA, MS, PhD, MD, ect.)"))
 
-    married_num = 1 if married == "Married" else 0
+if education == "Some High School":
+    education = 1
+elif education == "High School Graduate":
+    education = 2
+else:
+    education = 3
 
-    female_num = 1 if gender == "Female" else 0
+Marital = st.selectbox(label="Are you married?",
+options=("Yes", 
+"No"))
+if Marital == "Yes":
+    Marital = 1
+else:
+    Marital = 0
 
-    return [age, education_num, income_num, parent_num, married_num, female_num]
+Parent = st.selectbox(label="Are you the parent of a child under the age of 18?",
+options=("Yes", 
+"No"))
 
-if st.button('Predict LinkedIn Usage'):
-    processed_inputs = process_inputs(age, education, income, parent, married, female)
+if Parent == "Yes":
+    Parent = 1
+else:
+    Parent = 0
 
-    input_df = pd.DataFrame([processed_inputs], columns=['age', 'education', 'income', 'parent', 'married', 'female'])
+female = st.selectbox(label="Are you a male or female?",
+options=("Female", 
+"Male"))
 
-    prediction = logreg.predict(input_df)
-    probability = logreg.predict_proba(input_df)[:, 1]
+if female == "Yes":
+    female = 1
+else:
+    female = 0
 
-    st.subheader('Prediction')
-    st.write('LinkedIn User' if prediction[0] else 'Not a LinkedIn User')
-    st.subheader('Prediction Probability')
-    st.write(f"The probability of the person using LinkedIn is: {probability[0]:.2f}")
+st.write(f"Prediction: {predicted_class[0]}")
+st.write("(1 = LinkedIn User, 0 = Not a LinkedIn User)")
+
+st.write(f"Probability that you are a LinkedIn User: {probs[0][1]}")
