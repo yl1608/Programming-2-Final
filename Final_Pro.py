@@ -87,3 +87,92 @@ log_model.summary()
 
 log_model_sklearn = LogisticRegression(class_weight="balanced")
 log_model_sklearn.fit(x_train,y_train)
+
+age = st.slider("Age", min_value=0, max_value=97, value=30)
+education_options = [
+    "Less than high school",
+    "High school incomplete",
+    "High school graduate",
+    "Some Collge, no degree",
+    "Two-year associate degree",
+    "Four-year college or university degree",
+    "Some postgraduate or professional schooling",
+    "Postgraduate or professional degree",
+]
+education = st.selectbox("Education", education_options)
+
+income_options = [
+    "Less than $10,000",
+    "$10,000 to under $20,000",
+    "$20,000 to under $30,000",
+    "$30,000 to under $40,000",
+    "$40,000 to under $50,000",
+    "$50,000 to under $75,000",
+    "$75,000 to under $100,000",
+    "$100,000 to under $150,000",
+    "$150,000 or more",
+    "Don't know",
+    "Refused",
+]
+income = st.selectbox("Income", income_options)
+
+parent_options = [
+    "Yes",
+    "No",
+    "Don't know",
+    "Refused",
+]
+parent = st.selectbox("Are you a parent of a child under 18 living in your home?", parent_options)
+
+marital_options = [
+    "Married",
+    "Living with a partner",
+    "Divorced",
+    "Separated",
+    "Widowed",
+    "Never been married",
+    "Don't know",
+    "Refused",
+]
+married = st.selectbox("Marital",marital_options)
+
+gender_options = [
+    "Male",
+    "Female",
+    "Other",
+    "Don't know",
+    "Refused",
+]
+female = st.selectbox("Gender",gender_options)
+
+
+def process_inputs(age, education, income, parent, married, gender):
+
+    education_mapping = {edu: idx for idx, edu in enumerate(education_options)}
+    education_num = education_mapping[education]
+
+    income_mapping = {inc: idx for idx, inc in enumerate(income_options)}
+    income_num = income_mapping[income]
+    if income in ["Don't know", "Refused"]:
+        income_num = np.nan
+
+    parent_num = 1 if parent == "Yes" else 0
+
+    married_num = 1 if married == "Married" else 0
+
+    female_num = 1 if gender == "Female" else 0
+
+    return [age, education_num, income_num, parent_num, married_num, female_num]
+
+if st.button('Predict LinkedIn Usage'):
+    processed_inputs = process_inputs(age, education, income, parent, married, female)
+
+    input_df = pd.DataFrame([processed_inputs], columns=['age', 'education', 'income', 'parent', 'married', 'female'])
+
+    prediction = logreg.predict(input_df)
+    probability = logreg.predict_proba(input_df)[:, 1]
+
+    st.subheader('Prediction')
+    st.write('LinkedIn User' if prediction[0] else 'Not a LinkedIn User')
+    st.subheader('Prediction Probability')
+    st.write(f"The probability of the person using LinkedIn is: {probability[0]:.2f}")
