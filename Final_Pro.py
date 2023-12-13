@@ -4,19 +4,19 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st 
 import altair as alt
+from PIL import Image
+import statsmodels.api as sm
 import sklearn
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
-from PIL import Image
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix,accuracy_score,classification_report 
 
 # Read data into a dataframe named "s"
 csv_file_path = "social_media_usage.csv"
 s = pd.read_csv(csv_file_path)
 # Check the dimensions of the dataframe
 print(s.shape)
-
 s.head()
 
 # Define the clean_sm function
@@ -51,7 +51,6 @@ ss=ss0.dropna()
 ss.columns
 ss.head()
 
-
 # Drop missing values
 ss = ss.dropna()
 
@@ -68,18 +67,12 @@ print(y)
 print("\nFeature Set (X):")
 print(X)
 
-from sklearn.model_selection import train_test_split
-
 # Define the target vector (y) and feature set (X)
 y = ss['sm_li']  # Target variable
 X = ss.drop('sm_li', axis=1)  # Features excluding the target variable
 
 # Split the data into training and test sets
 x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix,accuracy_score,classification_report
-import statsmodels.api as sm 
 
 # Display the shapes of the resulting sets
 print("X_train shape:", x_train.shape)
@@ -105,18 +98,6 @@ newdata = pd.DataFrame({
 newdata["sm_li"] = lr.predict(newdata) #Our new column
 
 newdata
-
-import streamlit as st 
-import pandas as pd
-import numpy as np
-import altair as alt
-import sklearn
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
-from PIL import Image
-
 
 st.markdown("LinkedIn User Prediction App")
 
@@ -184,3 +165,16 @@ if female == "Yes":
     female = 1
 else:
     female = 0
+
+if st.button('Predict LinkedIn Usage'):
+    processed_inputs = process_inputs(age, education, income, parent, married, female)
+
+    input_df = pd.DataFrame([processed_inputs], columns=['age', 'education', 'income', 'parent', 'married', 'female'])
+
+    prediction = logreg.predict(input_df)
+    probability = logreg.predict_proba(input_df)[:, 1]
+
+    st.subheader('Prediction')
+    st.write('LinkedIn User' if prediction[0] else 'Not a LinkedIn User')
+    st.subheader('Prediction Probability')
+    st.write(f"The probability of the person using LinkedIn is: {probability[0]:.2f}")
