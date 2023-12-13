@@ -95,11 +95,11 @@ lr.fit(x_train,y_train)
 
 newdata = pd.DataFrame({
     "income": [1,8,8],
-    "age": [12,42,82], 
     "education":[1,7,1],
-    "marital status":[0,1,1],
     "parent": [0,0,0],
+    "married":[0,1,1],
     "female": [0,1,1],
+    "age": [12,42,82],
 })
 
 newdata["sm_li"] = lr.predict(newdata) #Our new column
@@ -117,8 +117,6 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 
-image = Image.open('LinkedIn-Blue-21-┬«@2x.png')
-st.image(image, caption='Logo available publicly on LinkedIn Brand Resources webpage', output_format='PNG')
 
 st.markdown("LinkedIn User Prediction App")
 
@@ -186,8 +184,3 @@ if female == "Yes":
     female = 1
 else:
     female = 0
-
-st.write(f"Prediction: {predicted_class[0]}")
-st.write("(1 = LinkedIn User, 0 = Not a LinkedIn User)")
-
-st.write(f"Probability that you are a LinkedIn User: {probs[0][1]}")
