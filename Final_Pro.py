@@ -94,11 +94,11 @@ lr = LogisticRegression(class_weight="balanced")
 lr.fit(x_train,y_train)
 
 newdata = pd.DataFrame({
-    "Income": [1,8,8],
-    "Age": [12,42,82], 
+    "income": [1,8,8],
+    "age": [12,42,82], 
     "education":[1,7,1],
-    "Marital Status":[0,1,1],
-    "Parent": [0,0,0],
+    "marital status":[0,1,1],
+    "parent": [0,0,0],
     "female": [0,1,1],
 })
 
