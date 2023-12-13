@@ -166,6 +166,24 @@ if female == "Yes":
 else:
     female = 0
 
+def process_inputs(age, education, income, parent, married, gender):
+
+    education_mapping = {edu: idx for idx, edu in enumerate(education_options)}
+    education_num = education_mapping[education]
+
+    income_mapping = {inc: idx for idx, inc in enumerate(income_options)}
+    income_num = income_mapping[income]
+    if income in ["Don't know", "Refused"]:
+        income_num = np.nan
+
+    parent_num = 1 if parent == "Yes" else 0
+
+    married_num = 1 if married == "Married" else 0
+
+    female_num = 1 if gender == "Female" else 0
+
+    return [age, education_num, income_num, parent_num, married_num, female_num]
+
 if st.button('Predict LinkedIn Usage'):
     processed_inputs = process_inputs(age, education, income, parent, married, female)
 
